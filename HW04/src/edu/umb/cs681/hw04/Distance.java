@@ -20,20 +20,23 @@ public class Distance {
 
     public static List<List<Double>> matrix(List<List<Double>> points, DistanceMetric metric) {
         int numOfPoints = points.size();
-        List<List<Double>> distanceMatrix = Distance.initDistanceMatrix(numOfPoints);
+        List<List<Double>> distanceMatrix = new ArrayList<>(numOfPoints);
 
         IntStream.range(0, numOfPoints).forEach(i -> {
             List<Double> current = points.get(i);
+            List<Double> distances = new ArrayList<>(numOfPoints);
+
             IntStream.range(0, numOfPoints).forEach(j -> {
                 List<Double> peer = points.get(j);
-                double distance = Distance.get(current, peer, metric);
-                distanceMatrix.get(i).set(j, distance);
+                double distance = metric.distance(current, peer);
+                distances.add(distance);
             });
+
+            distanceMatrix.add(distances);
         });
 
         return distanceMatrix;
     }
-
 
     private static List<List<Double>> initDistanceMatrix(int numOfPoints){
         List<List<Double>> distanceMatrix = new ArrayList<>(numOfPoints);
