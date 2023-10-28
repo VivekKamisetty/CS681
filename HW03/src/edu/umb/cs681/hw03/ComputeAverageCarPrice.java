@@ -13,17 +13,15 @@ public class ComputeAverageCarPrice {
 		carList.add(new Car("Accord", "Honda", 50, 2016, 27000f));
 		carList.add(new Car("Accent", "Hyundai", 53, 2013, 15000f));
 		
-		CarPriceResultHolder averagePriceResult = carList.stream()
+		double averagePriceResult = carList.stream()
 				.map(car -> car.getPrice())
 				.reduce(new CarPriceResultHolder(), (result, price) -> {
 					result.accumulate(price);
 					return result;
-				}, (finalResult, intermediateResult) -> {
-					finalResult.combine(intermediateResult);
-					return finalResult;
-				});
-		double averagePrice = averagePriceResult.getAverage();
-		System.out.println("Average car price: " + averagePrice);
+				}, (finalResult, intermediateResult) -> finalResult
+				).getAverage();
+
+		System.out.println("Average car price: " + averagePriceResult);
 	}
 
 }
