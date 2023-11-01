@@ -24,7 +24,7 @@
 
     <target name="run" depends="compile">
         <!-- Run the Java class using the correct package structure -->
-        <java classname="edu.umb.cs681.hw05.DataProcessingTest" classpathref="classpath" fork="true"/>
+        <java classname="edu.umb.cs681.hw05.DataProcessor" classpathref="classpath" fork="true"/>
     </target>
 
     <target name="clean">
