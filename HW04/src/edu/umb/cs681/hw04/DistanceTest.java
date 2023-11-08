@@ -50,7 +50,7 @@ public class DistanceTest {
         for (int i = 0; i < numPoints; i++) {
             List<Double> point = new ArrayList<>();
             for (int j = 0; j < numDimensions; j++) {
-                point.add(random.nextDouble()); // Generated random values between 0 and 1
+                point.add((random.nextDouble() * 999));
             }
             points.add(point);
         }
