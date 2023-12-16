@@ -9,7 +9,11 @@ public class FileSystemCrawler {
 	private static AtomicBoolean terminateFlag = new AtomicBoolean(false);
     private static ThreadLocal<FileCrawlingVisitor> threadLocalFileCrawler = ThreadLocal.withInitial(() -> new FileCrawlingVisitor());
 	
-	public static void main(String [] args) {
+    private static synchronized void addToSharedList(List<File> files) {
+        sharedList.addAll(files);
+    }
+    
+    public static void main(String [] args) {
 		TestFixatureInitializer fixatureInitializer = new TestFixatureInitializer();
 		
 		fixatureInitializer.FileSystem1();
@@ -19,21 +23,21 @@ public class FileSystemCrawler {
 		Thread thread1 = new Thread(() -> {
 			FileCrawlingVisitor fileCrawler1 = threadLocalFileCrawler.get();
 			fixatureInitializer.DriveC.accept(fileCrawler1);
-			sharedList.addAll(fileCrawler1.getFiles());
+			addToSharedList(fileCrawler1.getFiles());
 			terminateFlag.set(true);
 		});
 		
 		Thread thread2 = new Thread(() -> {
 			FileCrawlingVisitor fileCrawler2 = threadLocalFileCrawler.get();
 			fixatureInitializer.DriveD.accept(fileCrawler2);
-			sharedList.addAll(fileCrawler2.getFiles());
+			addToSharedList(fileCrawler2.getFiles());
 			terminateFlag.set(true);
 		});
 		
 		Thread thread3 = new Thread(() -> {
 			FileCrawlingVisitor fileCrawler3 = threadLocalFileCrawler.get();
 			fixatureInitializer.DriveE.accept(fileCrawler3);
-			sharedList.addAll(fileCrawler3.getFiles());
+			addToSharedList(fileCrawler3.getFiles());
 			terminateFlag.set(true);
 		});
 		
@@ -50,11 +54,15 @@ public class FileSystemCrawler {
 			thread2.interrupt();
 			thread3.interrupt();
 			
-			List<File> allFiles = new ArrayList<>(sharedList);
-			System.out.println("Identified Files: ");
-			for (File file: allFiles) {
-				System.out.println(file.getName());
-			}
+			List<File> allFiles;
+			 synchronized (FileSystemCrawler.class) {
+	                allFiles = new ArrayList<>(sharedList);
+	            }
+
+	            System.out.println("Identified Files: ");
+	            for (File file : allFiles) {
+	                System.out.println(file.getName());
+	            }
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
