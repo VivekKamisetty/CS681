@@ -8,10 +8,6 @@ public class FileSystemCrawler {
 	private static List<File> sharedList = new ArrayList<>();
 	private static AtomicBoolean terminateFlag = new AtomicBoolean(false);
     private static ThreadLocal<FileCrawlingVisitor> threadLocalFileCrawler = ThreadLocal.withInitial(() -> new FileCrawlingVisitor());
-	
-    private static synchronized void addToSharedList(List<File> files) {
-        sharedList.addAll(files);
-    }
     
     public static void main(String [] args) {
 		TestFixatureInitializer fixatureInitializer = new TestFixatureInitializer();
