@@ -23,22 +23,25 @@ public class FileSystemCrawler {
 		Thread thread1 = new Thread(() -> {
 			FileCrawlingVisitor fileCrawler1 = threadLocalFileCrawler.get();
 			fixatureInitializer.DriveC.accept(fileCrawler1);
-			addToSharedList(fileCrawler1.getFiles());
-			terminateFlag.set(true);
+			synchronized (sharedList) {
+		        sharedList.addAll(fileCrawler1.getFiles());
+		    }			terminateFlag.set(true);
 		});
 		
 		Thread thread2 = new Thread(() -> {
 			FileCrawlingVisitor fileCrawler2 = threadLocalFileCrawler.get();
 			fixatureInitializer.DriveD.accept(fileCrawler2);
-			addToSharedList(fileCrawler2.getFiles());
-			terminateFlag.set(true);
+			synchronized (sharedList) {
+		        sharedList.addAll(fileCrawler2.getFiles());
+		    }			terminateFlag.set(true);
 		});
 		
 		Thread thread3 = new Thread(() -> {
 			FileCrawlingVisitor fileCrawler3 = threadLocalFileCrawler.get();
 			fixatureInitializer.DriveE.accept(fileCrawler3);
-			addToSharedList(fileCrawler3.getFiles());
-			terminateFlag.set(true);
+			synchronized (sharedList) {
+		        sharedList.addAll(fileCrawler3.getFiles());
+		    }			terminateFlag.set(true);
 		});
 		
 		thread1.start();
