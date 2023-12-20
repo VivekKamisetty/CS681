@@ -16,9 +16,9 @@ public class WithdrawRunnable implements Runnable {
     @Override
     public void run() {
         while (!done) {
-            bankAccount.withdraw(100); // Withdraw a fixed amount
+            bankAccount.withdraw(100); 
 
-            // Introduce a short delay for demonstration purposes (not mandatory)
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
