@@ -56,43 +56,70 @@ public class RunnablePrimeFactorizer extends PrimeFactorizer implements Runnable
 
 	public static void main(String[] args) {
 
-		    System.out.println("Factorization of 125 with one thread");
-		    RunnablePrimeFactorizer singleThreadFactorizer2 = new RunnablePrimeFactorizer(125, 2, (long) Math.sqrt(125));
-		    Thread singleThread2 = new Thread(singleThreadFactorizer2);
-		    singleThread2.start();
-		    try {
-		        singleThread2.join();
-		    } catch (InterruptedException e) {
-		        e.printStackTrace();
-		    }
-		    System.out.println("Final result: " + singleThreadFactorizer2.getPrimeFactors() + "\n");
+		// Factorization of 36 with a separate thread
+				System.out.println("Factorization of 36");
+				RunnablePrimeFactorizer runnable = new RunnablePrimeFactorizer(36, 2, (long)Math.sqrt(36));
+				Thread thread = new Thread(runnable);
+				System.out.println("Thread #" + thread.threadId() +
+					" performs factorization in the range of " + runnable.getFrom() + "->" + runnable.getTo());
+				thread.start();
+				try {
+					thread.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println("Final result: " + runnable.getPrimeFactors() + "\n");
 
+				// Factorization of 84 with two threads
+				System.out.println("Factorization of 84");
+				LinkedList<RunnablePrimeFactorizer> runnables = new LinkedList<RunnablePrimeFactorizer>();
+				LinkedList<Thread> threads = new LinkedList<Thread>();
 
-		    System.out.println("Factorization of 24 with two threads");
-		    LinkedList<RunnablePrimeFactorizer> runnables = new LinkedList<RunnablePrimeFactorizer>();
-		    LinkedList<Thread> threads = new LinkedList<Thread>();
+				runnables.add( new RunnablePrimeFactorizer(84, 2, (long)Math.sqrt(84)/2 ));
+				runnables.add( new RunnablePrimeFactorizer(84, 1+(long)Math.sqrt(84)/2, (long)Math.sqrt(84) ));
 
-		    runnables.add(new RunnablePrimeFactorizer(24, 2, (long) Math.sqrt(24) / 2));
-		    runnables.add(new RunnablePrimeFactorizer(24, 1 + (long) Math.sqrt(24) / 2, (long) Math.sqrt(24)));
+				thread = new Thread(runnables.get(0));
+				threads.add(thread);
+				System.out.println("Thread #" + thread.threadId() +
+					" performs factorization in the range of " + runnables.get(0).getFrom() + "->" + runnables.get(0).getTo());
 
-		    for (RunnablePrimeFactorizer r : runnables) {
-		        Thread t = new Thread(r);
-		        threads.add(t);
-		        t.start();
-		    }
+				thread = new Thread(runnables.get(1));
+				threads.add(thread);
+				System.out.println("Thread #" + thread.threadId() +
+					" performs factorization in the range of " + runnables.get(1).getFrom() + "->" + runnables.get(1).getTo());
 
-		    for (Thread t : threads) {
-		        try {
-		            t.join();
-		        } catch (InterruptedException e) {
-		            e.printStackTrace();
-		        }
-		    }
+				threads.forEach( (t)->t.start() );
+				threads.forEach( (t)->{	try{t.join();}
+										catch(InterruptedException e){e.printStackTrace(); }} );
 
-		    LinkedList<Long> factors = new LinkedList<Long>();
-		    for (RunnablePrimeFactorizer r : runnables) {
-		        factors.addAll(r.getPrimeFactors());
-		    }
-		    System.out.println("Final result: " + factors);
+				LinkedList<Long> factors = new LinkedList<Long>();
+				runnables.forEach( (factorizer) -> factors.addAll(factorizer.getPrimeFactors()) );
+				System.out.println("Final result: " + factors + "\n");
+
+				runnables.clear();
+				threads.clear();
+
+				// Factorization of 2489 with two threads
+				System.out.println("Factorization of 2489");
+				runnables.add( new RunnablePrimeFactorizer(2489, 2, (long)Math.sqrt(2489)/2 ));
+				runnables.add( new RunnablePrimeFactorizer(2489, 1+(long)Math.sqrt(2489)/2, (long)Math.sqrt(2489) ));
+
+				thread = new Thread(runnables.get(0));
+				threads.add(thread);
+				System.out.println("Thread #" + thread.threadId() +
+					" performs factorization in the range of " + runnables.get(0).getFrom() + "->" + runnables.get(0).getTo());
+
+				thread = new Thread(runnables.get(1));
+				threads.add(thread);
+				System.out.println("Thread #" + thread.threadId() +
+					" performs factorization in the range of " + runnables.get(1).getFrom() + "->" + runnables.get(1).getTo());
+
+				threads.forEach( (t)->t.start() );
+				threads.forEach( (t)->{	try{t.join();}
+										catch(InterruptedException e){e.printStackTrace(); }} );
+
+				LinkedList<Long> factors2 = new LinkedList<Long>();
+				runnables.forEach( (factorizer) -> factors2.addAll(factorizer.getPrimeFactors()) );
+				System.out.println("Final result: " + factors2);
 }
 }
