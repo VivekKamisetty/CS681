@@ -52,6 +52,13 @@ public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCan
                 new RunnableCancellableInterruptiblePrimeFactorizer(125, 2, (long) Math.sqrt(125));
         Thread interruptibleThread = new Thread(interruptibleFactorizer);
         interruptibleThread.start();
+
+        try {
+        	Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+        	ex.printStackTrace();
+        }
+        
         interruptibleFactorizer.setDone();
         interruptibleThread.interrupt();
         try {
