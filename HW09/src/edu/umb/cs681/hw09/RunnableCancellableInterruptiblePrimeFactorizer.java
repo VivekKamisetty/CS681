@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCancellablePrimeFactorizer {
 
     private boolean done = false;
-	private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public RunnableCancellableInterruptiblePrimeFactorizer(long dividend, long from, long to) {
         super(dividend, from, to);
@@ -26,17 +26,10 @@ public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCan
         while (dividend != 1 && divisor <= to) {
             lock.lock();
             try {
-                if (Thread.interrupted()) {
-                    System.out.println("Thread #" + Thread.currentThread().getId() + " is interrupted.");
+                if (done || Thread.currentThread().isInterrupted()) {
                     this.factors.clear();
                     break;
                 }
-
-                if (done) {
-                    this.factors.clear();
-                    break;
-                }
-
                 if (dividend % divisor == 0) {
                     this.factors.add(divisor);
                     dividend /= divisor;
@@ -59,6 +52,7 @@ public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCan
                 new RunnableCancellableInterruptiblePrimeFactorizer(125, 2, (long) Math.sqrt(125));
         Thread interruptibleThread = new Thread(interruptibleFactorizer);
         interruptibleThread.start();
+        interruptibleFactorizer.setDone();
         interruptibleThread.interrupt();
         try {
             interruptibleThread.join();
@@ -68,8 +62,8 @@ public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCan
         System.out.println("Final result: " + interruptibleFactorizer.getPrimeFactors() + "\n");
 
         System.out.println("Factorization of 24 with two threads");
-        LinkedList<RunnablePrimeFactorizer> runnables = new LinkedList<RunnablePrimeFactorizer>();
-        LinkedList<Thread> threads = new LinkedList<Thread>();
+        LinkedList<RunnablePrimeFactorizer> runnables = new LinkedList<>();
+        LinkedList<Thread> threads = new LinkedList<>();
 
         runnables.add(new RunnablePrimeFactorizer(24, 2, (long) Math.sqrt(24) / 2));
         runnables.add(new RunnableCancellableInterruptiblePrimeFactorizer(24, 1 + (long) Math.sqrt(24) / 2, (long) Math.sqrt(24)));
@@ -88,7 +82,7 @@ public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCan
             }
         }
 
-        LinkedList<Long> factors = new LinkedList<Long>();
+        LinkedList<Long> factors = new LinkedList<>();
         for (RunnablePrimeFactorizer r : runnables) {
             factors.addAll(r.getPrimeFactors());
         }
