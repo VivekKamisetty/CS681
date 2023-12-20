@@ -2,12 +2,15 @@ package edu.umb.cs681.hw10;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Directory extends FSElement {
 
     private LinkedList<FSElement> children = new LinkedList<FSElement>();
     private LinkedList<Directory> subDirectories = new LinkedList<Directory>();
     private LinkedList <File> files = new LinkedList<File>();
+    private ReentrantLock lock = new ReentrantLock();
+
 
     Directory(Directory parent, String name, int size, LocalDateTime creationTime) {
         super(parent, name, size, creationTime);
@@ -25,48 +28,79 @@ public class Directory extends FSElement {
 
 
     public LinkedList<FSElement> getChildren() {
-        return this.children;
+    	 lock.lock();
+         try {
+             return this.children;
+         } finally {
+             lock.unlock();
+         }
     }
 
     public void appendChild(FSElement child) {
-        this.children.add(child);
-        child.setParent(this);
+        
+        lock.lock();
+        try {
+            this.children.add(child);
+            child.setParent(this);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int countChildren() {
-        return getChildren().size();
+        
+        lock.lock();
+        try {
+            return getChildren().size();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public LinkedList<Directory> getSubDirectories() {
-        for( FSElement child : getChildren()) {
-            if (child.isDirectory()) {
-                subDirectories.add((Directory) child);
-            }
-        }
-        return subDirectories;
+         lock.lock();
+         try {
+             for (FSElement child : this.children) {
+                 if (child.isDirectory()) {
+                     subDirectories.add((Directory) child);
+                 }
+             }
+         } finally {
+             lock.unlock();
+         }
+         return subDirectories;
     }
 
     public LinkedList<File> getFiles() {
-        for( FSElement child : getChildren()) {
-            if (child.isFile()) {
-                files.add((File) child);
-            }
-        }
-        return files;
+    	 lock.lock();
+         try {
+             for (FSElement child : this.children) {
+                 if (child.isFile()) {
+                     files.add((File) child);
+                 }
+             }
+         } finally {
+             lock.unlock();
+         }
+         return files;
     }
 
     public int getTotalSize() {
-        int totalSize = this.getSize();
-        for (FSElement element : this.getChildren()) {
-            if (element.isDirectory()) {
-                totalSize += ((Directory) element).getTotalSize();
-            } else {
-                totalSize += element.getSize();
+    	int totalSize = this.getSize();
+        lock.lock();
+        try {
+            for (FSElement element : this.children) {
+                if (element.isDirectory()) {
+                    totalSize += ((Directory) element).getTotalSize();
+                } else {
+                    totalSize += element.getSize();
+                }
             }
+        } finally {
+            lock.unlock();
         }
         return totalSize;
     }
-
     @Override
     public boolean isDirectory() {
         // TODO Auto-generated method stub
