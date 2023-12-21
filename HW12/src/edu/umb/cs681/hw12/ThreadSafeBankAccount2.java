@@ -8,8 +8,13 @@ public class ThreadSafeBankAccount2 implements BankAccount{
 	private ReentrantLock lock = new ReentrantLock();
 	private Condition sufficientFundsCondition = lock.newCondition();
 	private Condition belowUpperLimitFundsCondition = lock.newCondition();
-	private volatile boolean done = false;
+    private volatile boolean done = false;
 
+
+    public void setDone() {
+        this.done = true;
+    }
+    
 	public void deposit(double amount){
 		lock.lock();
 		try{
@@ -25,14 +30,7 @@ public class ThreadSafeBankAccount2 implements BankAccount{
 			System.out.println(Thread.currentThread().threadId() +
 					" (d): new balance: " + balance);
 			sufficientFundsCondition.signalAll();
-			
-			if (done) {
-                System.out.println(Thread.currentThread().threadId() +
-                        " (d): Terminating the deposit thread gracefully.");
-                return; // Terminate the thread if done flag is set
-                
 		}
-	}
 		catch (InterruptedException exception){
 			exception.printStackTrace();
 		}
@@ -57,12 +55,6 @@ public class ThreadSafeBankAccount2 implements BankAccount{
 			System.out.println(Thread.currentThread().threadId() +
 					" (w): new balance: " + balance);
 			belowUpperLimitFundsCondition.signalAll();
-			
-			if (done) {
-                System.out.println(Thread.currentThread().threadId() +
-                        " (w): Terminating the withdraw thread gracefully.");
-                return; // Terminate the thread if done flag is set
-            }
 		}
 		catch (InterruptedException exception){
 			exception.printStackTrace();
@@ -73,35 +65,46 @@ public class ThreadSafeBankAccount2 implements BankAccount{
 		}
 	}
 
-	 public static void main(String[] args) {
-	        ThreadSafeBankAccount2 bankAccount = new ThreadSafeBankAccount2();
-	        WithdrawRunnable[] withdrawThreads = new WithdrawRunnable[5];
-	        DepositRunnable[] depositThreads = new DepositRunnable[5];
+	public double getBalance() { return this.balance; }
+    
+    public static void main(String[] args) {
+    	ThreadSafeBankAccount2 bankAccount = new ThreadSafeBankAccount2();
+        WithdrawRunnable[] withdrawRunnables = new WithdrawRunnable[5];
+        DepositRunnable[] depositRunnables = new DepositRunnable[5];
+        Thread[] withdrawThreads = new Thread[5];
+        Thread[] depositThreads = new Thread[5];
 
-	        for (int i = 0; i < 5; i++) {
-	            withdrawThreads[i] = new WithdrawRunnable(bankAccount);
-	            depositThreads[i] = new DepositRunnable(bankAccount);
-	            new Thread(withdrawThreads[i]).start();
-	            new Thread(depositThreads[i]).start();
-	        }
+        for (int i = 0; i < 5; i++) {
+            withdrawRunnables[i] = new WithdrawRunnable(bankAccount);
+            depositRunnables[i] = new DepositRunnable(bankAccount);
 
-	        // Let the threads run for some time (simulating prsocessing)
-	        try {
-	            Thread.sleep(2000); // Adjust this value as needed
-	        } catch (InterruptedException e) {
-	            e.printStackTrace();
-	        }
+            withdrawThreads[i] = new Thread(withdrawRunnables[i]);
+            depositThreads[i] = new Thread(depositRunnables[i]);
 
-	        // Terminate the threads
-	        for (int i = 0; i < 5; i++) {
-	            withdrawThreads[i].setDone();
-	            depositThreads[i].setDone();
-	        }
-	    }
+            withdrawThreads[i].start();
+            depositThreads[i].start();
+        }
 
-	@Override
-	public double getBalance() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	}
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+	    
+        for (int i = 0; i < 5; i++) {
+            withdrawRunnables[i].setDone();
+            depositRunnables[i].setDone();
+        }
+
+        for (int i = 0; i < 5; i++) {
+            try {
+                withdrawThreads[i].join();
+                depositThreads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+}
