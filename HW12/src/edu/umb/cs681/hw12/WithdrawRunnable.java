@@ -16,8 +16,7 @@ public class WithdrawRunnable implements Runnable {
     @Override
     public void run() {
         while (!done) {
-            bankAccount.withdraw(100); 
-
+            bankAccount.withdraw(100);
 
             try {
                 Thread.sleep(100);
