@@ -8,7 +8,6 @@ public class Link extends FSElement {
 
     private FSElement target;
 
-    public static ReentrantLock lock = new ReentrantLock();
     Link(Directory parent, String name, int size, LocalDateTime creationTime, FSElement target) {
         super(parent, name, size, creationTime);
         // TODO Auto-generated constructor stub
