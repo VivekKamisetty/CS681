@@ -43,6 +43,12 @@ public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCan
             } finally {
                 lock.unlock();
             }
+            
+            try {
+            	Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+            	ex.printStackTrace();
+            }
         }
     }
 
@@ -53,12 +59,6 @@ public class RunnableCancellableInterruptiblePrimeFactorizer extends RunnableCan
         Thread interruptibleThread = new Thread(interruptibleFactorizer);
         interruptibleThread.start();
 
-        try {
-        	Thread.sleep(3000);
-        } catch (InterruptedException ex) {
-        	ex.printStackTrace();
-        }
-        
         interruptibleFactorizer.setDone();
         interruptibleThread.interrupt();
         try {
