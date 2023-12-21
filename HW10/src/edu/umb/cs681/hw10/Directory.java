@@ -9,7 +9,6 @@ public class Directory extends FSElement {
     private LinkedList<FSElement> children = new LinkedList<FSElement>();
     private LinkedList<Directory> subDirectories = new LinkedList<Directory>();
     private LinkedList <File> files = new LinkedList<File>();
-    private ReentrantLock lock = new ReentrantLock();
 
 
     Directory(Directory parent, String name, int size, LocalDateTime creationTime) {
