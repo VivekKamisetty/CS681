@@ -38,6 +38,10 @@ public class TestConcurrentObservers {
 	            handler.stop();
 	        }
 
+		 for (Thread thread : threads) {
+	            thread.interrupt();
+	        }
+
 	        for (Thread thread : threads) {
 	            try {
 	                thread.join();
