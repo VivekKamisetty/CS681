@@ -29,9 +29,7 @@ public class FileSystemCrawler {
             terminateCrawlingThreads(new Thread[]{thread1, thread2, thread3});
 
             List<File> allFiles;
-            synchronized (sharedList) {
-                allFiles = new ArrayList<>(sharedList);
-            }
+            allFiles = new ArrayList<>(sharedList);
 
             System.out.println("Identified Files:");
             for (File file : allFiles) {
@@ -47,10 +45,7 @@ public class FileSystemCrawler {
             FileCrawlingVisitor fileCrawler = threadLocalFileCrawler.get();
             drive.accept(fileCrawler);
             List<File> identifiedFiles = fileCrawler.getFiles(); 
-
-            synchronized (sharedList) {
                 sharedList.addAll(identifiedFiles);
-            }
             terminateFlag = true;
         });
         thread.start();
