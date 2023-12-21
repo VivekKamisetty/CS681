@@ -3,7 +3,6 @@ import java.time.LocalDateTime;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class File extends FSElement {
-    public static ReentrantLock lock = new ReentrantLock();
 
     File(Directory parent, String name, int size, LocalDateTime creationTime) {
         super(parent, name, size, creationTime);
