@@ -96,6 +96,12 @@ public class ThreadSafeBankAccount2 implements BankAccount{
             withdrawRunnables[i].setDone();
             depositRunnables[i].setDone();
         }
+	
+	for (int t  = 0; t < 5; t++) {
+        	withdrawThreads[t].interrupt();
+        	depositThreads[t].interrupt();
+        	
+        }
 
         for (int i = 0; i < 5; i++) {
             try {
