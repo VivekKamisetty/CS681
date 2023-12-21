@@ -16,8 +16,8 @@ public class DepositRunnable implements Runnable {
     @Override
     public void run() {
         while (!done) {
-            bankAccount.deposit(100); 
-            
+            bankAccount.deposit(100);
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
