@@ -1,4 +1,4 @@
-##Description of the App:
+###Description of the App:
 I have created an app which implements Item Inventory System.
 
 #ThreadUnsafe:
